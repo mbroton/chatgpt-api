@@ -1,19 +1,30 @@
-# ChatGPT API
+<h1 align="center">💻 ChatGPT API</h1>
 
-Unofficial API client and CLI for ChatGPT. Based on `httpx`, it uses only HTTP requests to communicate.
+<p align="center">Unofficial API client and CLI for ChatGPT.</p>
+
+<p align="center">
+    <img alt="PyPI" src="https://img.shields.io/pypi/v/chatgpt-api">
+    <img alt="GitHub" src="https://img.shields.io/github/license/mbroton/chatgpt-api">
+    <img alt="Snyk Vulnerabilities for GitHub Repo" src="https://img.shields.io/snyk/vulnerabilities/github/mbroton/chatgpt-api">
+</p>
+<br>
 
 ![Short Demo GIF](https://user-images.githubusercontent.com/50829834/205704349-183b1e73-6e3e-4c91-b537-c51e5cefdf17.gif)
 
-This project uses [Typer with Rich](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported):
+<br>
+
+This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported):
 
 ![Example of Markdown](https://user-images.githubusercontent.com/50829834/205705518-a23cef55-75c7-407f-bb4f-500bffc1ede7.png)
 
+<br>
 ## Installation
 
 ```
 pip install chatgpt-api
 ```
 
+<br>
 ## Usage
 
 ### As a Command Line Interface
