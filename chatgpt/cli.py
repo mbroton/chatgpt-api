@@ -8,9 +8,11 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
+from chatgpt import exceptions
 from chatgpt.api import ChatGPT
 
 
+PACKAGE_GH_URL = "https://github.com/mbroton/chatgpt-api"
 CONFIG_DIR = Path.home() / ".config" / "chatgpt_api"
 SESSION_KEY_FILE = CONFIG_DIR / "key.txt"
 
@@ -37,7 +39,7 @@ def setup() -> None:
     console.print(
         "Session key is required for chatting. "
         "If you don't know how to obtain it, "
-        "visit https://github.com/mbroton/chatgpt-api\n"
+        f"visit {PACKAGE_GH_URL}\n"
     )
     key = typer.prompt("Session key:\n", prompt_suffix="")
     SESSION_KEY_FILE.write_text(key.strip())
@@ -84,6 +86,14 @@ def start(response_timeout: int = 20) -> None:
             try:
                 with console.status("[bold green]Waiting for response..."):
                     response = chat.send_message(message)
+            except exceptions.UnauthorizedException:
+                err_console.print(
+                    "[bold red]Unauthorized. Probably your session "
+                    "key expired.\nTo generate a new key, "
+                    f"follow instructions at {PACKAGE_GH_URL}.\n"
+                    "Then, execute the command `chatgpt setup`."
+                )
+                return
             except TimeoutError:
                 err_console.print(
                     "[bold red]Response timed out. ChatGPT may be overloaded, "
@@ -95,8 +105,5 @@ def start(response_timeout: int = 20) -> None:
 
 
 def main() -> int:
-    try:
-        app()
-        return 0
-    except Exception:
-        return 1
+    app()
+    return 0

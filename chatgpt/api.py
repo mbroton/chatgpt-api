@@ -10,6 +10,7 @@ import httpx
 
 from chatgpt.exceptions import InvalidResponseException
 from chatgpt.exceptions import StatusCodeException
+from chatgpt.exceptions import UnauthorizedException
 
 
 _AUTH_URL = "https://chat.openai.com/api/auth/session"
@@ -102,6 +103,8 @@ class ChatGPT(httpx.Client):
             response = self.post(_CONV_URL, headers=headers, data=data)
         except httpx.ReadTimeout:
             raise TimeoutError()
+        if response.status_code == 401:
+            raise UnauthorizedException()
         if response.status_code != 200:
             raise StatusCodeException(response)
         resp_match = re.findall(r"data: ({.+})\n", response.text)[-1]
