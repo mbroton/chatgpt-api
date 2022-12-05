@@ -20,7 +20,7 @@ err_console = Console(stderr=True)
 
 
 @app.command()
-def setup() -> int:
+def setup() -> None:
     """Setup a chat."""
     console.print(f"Config directory: {CONFIG_DIR}")
     if not os.path.exists(CONFIG_DIR.absolute()):
@@ -33,7 +33,7 @@ def setup() -> int:
             console.print(f"[green]Directory {CONFIG_DIR} created")
         else:
             err_console.print("[red bold]Could not configure chat.")
-            return 1
+            return
     console.print(
         "Session key is required for chatting. "
         "If you don't know how to obtain it, "
@@ -42,11 +42,10 @@ def setup() -> int:
     key = typer.prompt("Session key:\n", prompt_suffix="")
     SESSION_KEY_FILE.write_text(key.strip())
     console.print("[bold green]Configuration saved![/]")
-    return 0
 
 
 @app.command()
-def start() -> int:
+def start(response_timeout: int = 20) -> None:
     """Start chatting at ChatGPT."""
     try:
         session_key = SESSION_KEY_FILE.read_text()
@@ -54,10 +53,12 @@ def start() -> int:
         err_console.print(
             "[red bold]Config file doesn't exist. Use `aichat setup` command."
         )
-        return 1
+        return
     _auth_progress = console.status("[bold green]Authenticating...")
     _auth_progress.start()
-    with ChatGPT(session_token=session_key) as chat:
+    with ChatGPT(
+        session_token=session_key, response_timeout=response_timeout
+    ) as chat:
         _auth_progress.stop()
         console.print(
             Panel(
@@ -65,7 +66,8 @@ def start() -> int:
                 "ChatGPT is going to remember what you said earlier "
                 "in the conversation.\n"
                 "Commands available during conversation:\n"
-                "\t[bold]!new[/] - starting a new conversation",
+                "\t[bold]!new[/] - starting a new conversation\n"
+                "\t[bold]!exit[/] - exit the program (CTRL+C works too)",
                 expand=False,
             )
         )
@@ -76,8 +78,19 @@ def start() -> int:
                 chat.new_conversation()
                 console.rule("[bold green]Starting new conversation")
                 continue
-            with console.status("[bold green]Waiting for response..."):
-                response = chat.send_message(message)
+            elif message == "!exit":
+                console.print("[bold green]Bye!")
+                break
+            try:
+                with console.status("[bold green]Waiting for response..."):
+                    response = chat.send_message(message)
+            except TimeoutError:
+                err_console.print(
+                    "[bold red]Response timed out. ChatGPT may be overloaded, "
+                    "try to increase timeout using `--response_timeout` "
+                    "argument.\nIf it won't help, try again later."
+                )
+                continue
             console.print(Panel(Markdown(response.content)))
 
 
