@@ -4,3 +4,7 @@ class StatusCodeException(ValueError):
 
 class InvalidResponseException(ValueError):
     pass
+
+
+class UnauthorizedException(ValueError):
+    pass
