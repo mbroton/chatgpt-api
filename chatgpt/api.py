@@ -30,7 +30,7 @@ class ChatGPT(httpx.Client):
         *,
         session_token: str,
         response_timeout: int = 10,
-        **kwargs: typing.Any
+        **kwargs: typing.Any,
     ) -> None:
         self._session_token = session_token
         self._access_token = None
