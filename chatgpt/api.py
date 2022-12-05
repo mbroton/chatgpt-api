@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import re
 import typing
@@ -35,6 +37,18 @@ class ChatGPT(httpx.Client):
         self._conversation_id = conversation_id
         self._auth_flag = False
         super().__init__(**kwargs)
+
+    @property
+    def conversation_id(self) -> str | None:
+        return self._conversation_id
+
+    def __enter__(self):
+        super().__enter__()
+        self.authenticate()
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        super().__exit__(*args, **kwargs)
 
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
