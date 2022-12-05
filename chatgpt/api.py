@@ -117,7 +117,6 @@ class ChatGPT(httpx.Client):
             )
             self._conversation_id = conversation_id
             self._parent_message_id = resp_data["message"]["id"]
-            print(self._conversation_id, self._parent_message_id)
             return resp
         except Exception as e:
             raise InvalidResponseException(response.text) from e
