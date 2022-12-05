@@ -18,6 +18,7 @@ This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](h
 ![Example of Markdown](https://user-images.githubusercontent.com/50829834/205705518-a23cef55-75c7-407f-bb4f-500bffc1ede7.png)
 
 <br>
+
 ## Installation
 
 ```
@@ -25,6 +26,7 @@ pip install chatgpt-api
 ```
 
 <br>
+
 ## Usage
 
 ### As a Command Line Interface
@@ -41,6 +43,8 @@ chatgpt setup
 ```sh
 chatgpt start
 ```
+
+<br>
 
 ### As an API
 
@@ -66,6 +70,8 @@ chat.send_message("Hello!")
 chat.close()
 ```
 
+<br>
+
 ## How to acquire session key?
 
 After you log in to ChatGPT in your browser, get value of `__Secure-next-auth.session-token` cookie. In this project, this is named as a "session key".
@@ -81,9 +87,13 @@ After you log in to ChatGPT in your browser, get value of `__Secure-next-auth.se
 
 Now, you can use it in CLI or directly from Python code.
 
+<br>
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
+<br>
 
 ## Disclaimer
 
