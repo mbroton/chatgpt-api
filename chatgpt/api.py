@@ -29,13 +29,15 @@ class ChatGPT(httpx.Client):
         self,
         *,
         session_token: str,
-        conversation_id: str | None = None,
+        response_timeout: int = 10,
         **kwargs: typing.Any
     ) -> None:
         self._session_token = session_token
         self._access_token = None
-        self._conversation_id = conversation_id
+        self._conversation_id = None
+        self._parent_message_id = _generate_uuid()
         self._auth_flag = False
+        kwargs["timeout"] = response_timeout
         super().__init__(**kwargs)
 
     @property
@@ -91,12 +93,15 @@ class ChatGPT(httpx.Client):
                         },
                     }
                 ],
-                "conversation_id": None,
-                "parent_message_id": _generate_uuid(),
+                "conversation_id": self._conversation_id,
+                "parent_message_id": self._parent_message_id,
                 "model": "text-davinci-002-render",
             }
         )
-        response = self.post(_CONV_URL, headers=headers, data=data)
+        try:
+            response = self.post(_CONV_URL, headers=headers, data=data)
+        except httpx.ReadTimeout:
+            raise TimeoutError()
         if response.status_code != 200:
             raise StatusCodeException(response)
         resp_match = re.findall(r"data: ({.+})\n", response.text)[-1]
@@ -111,6 +116,8 @@ class ChatGPT(httpx.Client):
                 content="\n\n".join(resp_data["message"]["content"]["parts"]),
             )
             self._conversation_id = conversation_id
+            self._parent_message_id = resp_data["message"]["id"]
+            print(self._conversation_id, self._parent_message_id)
             return resp
         except Exception as e:
             raise InvalidResponseException(response.text) from e
@@ -118,6 +125,7 @@ class ChatGPT(httpx.Client):
     def new_conversation(self) -> None:
         """Starts new conversation."""
         self._conversation_id = None
+        self._parent_message_id = _generate_uuid()
 
 
 def _generate_uuid() -> str:
