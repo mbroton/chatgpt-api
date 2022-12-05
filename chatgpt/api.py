@@ -1,50 +1,50 @@
 import json
 import re
+import typing
 import uuid
 from dataclasses import dataclass
 
 import httpx
 
-from aichat.exceptions import InvalidResponseException
-from aichat.exceptions import StatusCodeException
+from chatgpt.exceptions import InvalidResponseException
+from chatgpt.exceptions import StatusCodeException
+
+
+_AUTH_URL = "https://chat.openai.com/api/auth/session"
+_CONV_URL = "https://chat.openai.com/backend-api/conversation"
+_AUTH_COOKIE_NAME = "__Secure-next-auth.session-token"
 
 
 @dataclass
 class Response:
     id: str
-    conversation_id: str | None
+    conversation_id: str
     content: str
 
 
-def _get_uuid() -> str:
-    return str(uuid.uuid4())
-
-
-class Chat:
-    AUTH_URL = "https://chat.openai.com/api/auth/session"
-    CONV_URL = "https://chat.openai.com/backend-api/conversation"
-    AUTH_COOKIE_NAME = "__Secure-next-auth.session-token"
-
+class ChatGPT(httpx.Client):
     def __init__(
         self,
-        client: httpx.Client,
+        *,
         session_token: str,
         conversation_id: str | None = None,
+        **kwargs: typing.Any
     ) -> None:
         self._session_token = session_token
         self._access_token = None
         self._conversation_id = conversation_id
-        self._client = client
-        self._is_auth = False
+        self._auth_flag = False
+        super().__init__(**kwargs)
 
-    def _auth(self) -> None:
-        self._client.cookies.set(self.AUTH_COOKIE_NAME, self._session_token)
-        response = self._client.get(self.AUTH_URL)
+    def authenticate(self) -> None:
+        """Authenticates HTTP session."""
+        self.cookies.set(_AUTH_COOKIE_NAME, self._session_token)
+        response = self.get(_AUTH_URL)
         if response.status_code != 200:
             raise StatusCodeException(response)
 
         # If cookie is not set, it means that probably session_token is invalid
-        if self.AUTH_COOKIE_NAME not in response.cookies:
+        if _AUTH_COOKIE_NAME not in response.cookies:
             raise InvalidResponseException(
                 "Unable to authenticate. Verify if session token is valid. "
                 "You can set up new session token with command `aichat setup`."
@@ -53,14 +53,12 @@ class Chat:
             self._access_token = response.json()["accessToken"]
         except Exception as e:
             raise InvalidResponseException(response.content) from e
-        self._is_auth = True
+        self._auth_flag = True
 
-    def new_conversation(self) -> None:
-        self._conversation_id = None
-
-    def say(self, message: str) -> Response:
-        if not self._is_auth:
-            self._auth()
+    def send_message(self, message: str) -> Response:
+        """Sends message to the chat bot."""
+        if not self._auth_flag:
+            self.authenticate()
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer {}".format(self._access_token),
@@ -71,7 +69,7 @@ class Chat:
                 "action": "next",
                 "messages": [
                     {
-                        "id": _get_uuid(),
+                        "id": _generate_uuid(),
                         "role": "user",
                         "content": {
                             "content_type": "text",
@@ -80,11 +78,11 @@ class Chat:
                     }
                 ],
                 "conversation_id": None,
-                "parent_message_id": _get_uuid(),
+                "parent_message_id": _generate_uuid(),
                 "model": "text-davinci-002-render",
             }
         )
-        response = self._client.post(self.CONV_URL, headers=headers, data=data)
+        response = self.post(_CONV_URL, headers=headers, data=data)
         if response.status_code != 200:
             raise StatusCodeException(response)
         resp_match = re.findall(r"data: ({.+})\n", response.text)[-1]
@@ -102,3 +100,11 @@ class Chat:
             return resp
         except Exception as e:
             raise InvalidResponseException(response.text) from e
+
+    def new_conversation(self) -> None:
+        """Starts new conversation."""
+        self._conversation_id = None
+
+
+def _generate_uuid() -> str:
+    return str(uuid.uuid4())
