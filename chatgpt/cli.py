@@ -79,3 +79,11 @@ def start() -> int:
             with console.status("[bold green]Waiting for response..."):
                 response = chat.send_message(message)
             console.print(Panel(Markdown(response.content)))
+
+
+def main() -> int:
+    try:
+        app()
+        return 0
+    except Exception:
+        return 1
