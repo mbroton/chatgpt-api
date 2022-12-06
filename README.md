@@ -54,7 +54,7 @@ Recommended usage:
 ```python
 from chatgpt.api import ChatGPT
 
-with ChatGPT(session_key="your-session-key") as chat:
+with ChatGPT(session_token="your-session-token") as chat:
     response = chat.send_message("Hello!")
     print(response.content)
 ```
@@ -63,9 +63,10 @@ Without context manager you have to explicitly authenticate:
 ```python
 from chatgpt.api import ChatGPT
 
-chat = ChatGPT(session_key="your-session-key")
+chat = ChatGPT(session_token="your-session-token")
 chat.authenticate()
-chat.send_message("Hello!")
+response = chat.send_message("Hello!")
+print(response.content)
 chat.close()
 ```
 
