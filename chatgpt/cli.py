@@ -47,7 +47,7 @@ def setup() -> None:
 
 
 @app.command()
-def start(response_timeout: int = 20) -> None:
+def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
     """Start chatting at ChatGPT."""
     try:
         session_key = SESSION_KEY_FILE.read_text()
@@ -59,7 +59,9 @@ def start(response_timeout: int = 20) -> None:
     _auth_progress = console.status("[bold green]Authenticating...")
     _auth_progress.start()
     with ChatGPT(
-        session_token=session_key, response_timeout=response_timeout
+        session_token=session_key,
+        response_timeout=response_timeout,
+        user_agent=user_agent,
     ) as chat:
         _auth_progress.stop()
         console.print(
