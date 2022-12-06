@@ -5,7 +5,6 @@
 <p align="center">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/chatgpt-api">
     <img alt="GitHub" src="https://img.shields.io/github/license/mbroton/chatgpt-api">
-    <img alt="Snyk Vulnerabilities for GitHub Repo" src="https://img.shields.io/snyk/vulnerabilities/github/mbroton/chatgpt-api">
 </p>
 <br>
 
