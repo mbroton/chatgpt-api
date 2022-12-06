@@ -10,9 +10,9 @@ from rich.panel import Panel
 
 from chatgpt import exceptions
 from chatgpt.api import ChatGPT
+from chatgpt.const import PACKAGE_GH_URL
 
 
-PACKAGE_GH_URL = "https://github.com/mbroton/chatgpt-api"
 CONFIG_DIR = Path.home() / ".config" / "chatgpt_api"
 SESSION_KEY_FILE = CONFIG_DIR / "key.txt"
 
