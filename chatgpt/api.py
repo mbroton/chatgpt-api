@@ -8,6 +8,8 @@ from dataclasses import dataclass
 
 import httpx
 
+from chatgpt.const import PACKAGE_GH_URL
+from chatgpt.exceptions import ForbiddenException
 from chatgpt.exceptions import InvalidResponseException
 from chatgpt.exceptions import StatusCodeException
 from chatgpt.exceptions import UnauthorizedException
@@ -65,6 +67,11 @@ class ChatGPT(httpx.Client):
         response = self.get(
             _AUTH_URL, headers={"User-Agent": self._user_agent}
         )
+        if response.status_code == 403:
+            raise ForbiddenException(
+                "Access forbidden. It may indicate that something "
+                f"had changed on ChatGPT side. See {PACKAGE_GH_URL}/issues"
+            )
         if response.status_code != 200:
             raise StatusCodeException(response)
 
@@ -83,7 +90,9 @@ class ChatGPT(httpx.Client):
     def send_message(self, message: str) -> Response:
         """Sends message to the chat bot."""
         if not self._auth_flag:
-            self.authenticate()
+            raise UnauthorizedException(
+                "In order to send messages you have to authenticate first."
+                )
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer {}".format(self._access_token),
@@ -114,7 +123,7 @@ class ChatGPT(httpx.Client):
             raise TimeoutError()
         if response.status_code == 401:
             raise UnauthorizedException()
-        if response.status_code != 200:
+        elif response.status_code != 200:
             raise StatusCodeException(response)
         resp_match = re.findall(r"data: ({.+})\n", response.text)[-1]
         if not resp_match:
