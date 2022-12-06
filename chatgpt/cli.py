@@ -53,7 +53,7 @@ def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
         session_key = SESSION_KEY_FILE.read_text()
     except FileNotFoundError:
         err_console.print(
-            "[red bold]Config file doesn't exist. Use `aichat setup` command."
+            "[red bold]Config file doesn't exist. Use `chatgpt setup` command."
         )
         return
     _auth_progress = console.status("[bold green]Authenticating...")
