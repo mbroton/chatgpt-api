@@ -1,0 +1,5 @@
+httpx
+typer[all]
+pytest
+pytest_httpx
+coverage
