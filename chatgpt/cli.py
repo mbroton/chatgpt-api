@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import httpx
 import typer
 from rich.console import Console
 from rich.markdown import Markdown
@@ -96,7 +97,7 @@ def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
                     "Then, execute the command `chatgpt setup`."
                 )
                 return
-            except TimeoutError:
+            except httpx.ReadTimeout:
                 err_console.print(
                     "[bold red]Response timed out. ChatGPT may be overloaded, "
                     "try to increase timeout using `--response_timeout` "
