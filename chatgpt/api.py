@@ -109,21 +109,18 @@ class ChatGPT(httpx.Client):
             conv_id=self._conversation_id,
             parent_msg_id=self._parent_message_id,
         )
-        try:
-            response = self.post(
-                self._CONV_URL, headers=self._chatgpt_headers, data=data
-            )
-        except httpx.ReadTimeout:
-            raise TimeoutError()
+        response = self.post(
+            self._CONV_URL, headers=self._chatgpt_headers, data=data
+        )
 
         if response.status_code == 401:
             raise UnauthorizedException()
         elif response.status_code != 200:
             raise StatusCodeException(response)
-
-        resp_match = re.findall(r"data: ({.+})\n", response.text)[-1]
-        if not resp_match:
+        resp_matches = re.findall(r"data: ({.+})\n", response.text)
+        if not resp_matches:
             raise InvalidResponseException(response.text)
+        resp_match = resp_matches[-1]
 
         try:
             resp_data: dict = json.loads(resp_match)
