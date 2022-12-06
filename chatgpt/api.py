@@ -16,6 +16,10 @@ from chatgpt.exceptions import UnauthorizedException
 _AUTH_URL = "https://chat.openai.com/api/auth/session"
 _CONV_URL = "https://chat.openai.com/backend-api/conversation"
 _AUTH_COOKIE_NAME = "__Secure-next-auth.session-token"
+_DEFAULT_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+)
 
 
 @dataclass
@@ -31,6 +35,7 @@ class ChatGPT(httpx.Client):
         *,
         session_token: str,
         response_timeout: int = 10,
+        user_agent: str | None = None,
         **kwargs: typing.Any,
     ) -> None:
         self._session_token = session_token
@@ -38,6 +43,7 @@ class ChatGPT(httpx.Client):
         self._conversation_id = None
         self._parent_message_id = _generate_uuid()
         self._auth_flag = False
+        self._user_agent = user_agent or _DEFAULT_USER_AGENT
         kwargs["timeout"] = response_timeout
         super().__init__(**kwargs)
 
@@ -56,7 +62,9 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         self.cookies.set(_AUTH_COOKIE_NAME, self._session_token)
-        response = self.get(_AUTH_URL)
+        response = self.get(
+            _AUTH_URL, headers={"User-Agent": self._user_agent}
+        )
         if response.status_code != 200:
             raise StatusCodeException(response)
 
@@ -80,6 +88,7 @@ class ChatGPT(httpx.Client):
             "Accept": "application/json",
             "Authorization": "Bearer {}".format(self._access_token),
             "Content-Type": "application/json",
+            "User-Agent": self._user_agent,
         }
         data = json.dumps(
             {
