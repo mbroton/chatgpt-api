@@ -27,3 +27,9 @@ def chatgpt_authenticated(httpx_mock, session_token):
 
     with api.ChatGPT(session_token=session_token) as chat:
         yield chat
+
+
+@pytest.fixture
+def valid_response_data():
+    with open("tests/valid_response_test_data.txt") as f:
+        return f.read()

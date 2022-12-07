@@ -6,15 +6,12 @@ from chatgpt import exceptions
 
 
 def test_api_send_message_valid(
-    httpx_mock, chatgpt_authenticated: api.ChatGPT
+    httpx_mock, chatgpt_authenticated: api.ChatGPT, valid_response_data
 ):
-    with open("tests/valid_response_test_data.txt") as f:
-        response_text = f.read()
-
     def custom_response(request):
         return httpx.Response(
             status_code=200,
-            content=response_text,
+            content=valid_response_data,
         )
 
     httpx_mock.add_callback(custom_response, url=api.ChatGPT._CONV_URL)

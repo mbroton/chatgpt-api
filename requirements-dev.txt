@@ -2,4 +2,5 @@ httpx
 typer[all]
 pytest
 pytest_httpx
+pytest-mock
 coverage

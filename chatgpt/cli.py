@@ -23,7 +23,7 @@ err_console = Console(stderr=True)
 
 
 @app.command()
-def setup() -> None:
+def setup():
     """Setup a chat."""
     console.print(f"Config directory: {CONFIG_DIR}")
     if not os.path.exists(CONFIG_DIR.absolute()):
@@ -48,7 +48,7 @@ def setup() -> None:
 
 
 @app.command()
-def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
+def start(response_timeout: int = 20, user_agent: str | None = None):
     """Start chatting at ChatGPT."""
     try:
         session_key = SESSION_KEY_FILE.read_text()
@@ -105,8 +105,3 @@ def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
                 )
                 continue
             console.print(Panel(Markdown(response.content)))
-
-
-def main() -> int:
-    app()
-    return 0
