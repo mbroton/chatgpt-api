@@ -4,7 +4,8 @@
 
 <p align="center">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/chatgpt-api">
-    <img alt="GitHub" src="https://img.shields.io/github/license/mbroton/chatgpt-api">
+    <img alt="License" src="https://img.shields.io/github/license/mbroton/chatgpt-api">
+    <img alt="Coverage" src="https://img.shields.io/badge/coverage-85%25-green">
 </p>
 <br>
 
@@ -12,19 +13,27 @@
 
 <br>
 
-This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported):
+This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has ~90% code coverage unlike other ChatGPT packages.
 
-![Example of Markdown](https://user-images.githubusercontent.com/50829834/205705518-a23cef55-75c7-407f-bb4f-500bffc1ede7.png)
+![Long Demo GIF](https://user-images.githubusercontent.com/50829834/206066495-2ed2ae06-899a-41df-8d9e-b1dfc048cfaa.gif)
 
-<br>
+
+## Status
+
+ChatGPT API often changes. I'm trying to make updates as soon as possible. So, if something is not working properly and you recently didn't upgrade `chatgpt-api`, try to do this first:
+
+```sh
+pip install --upgrade chatgpt-api
+```
+
+If that doesn't help, please open an issue.
+
 
 ## Installation
 
 ```
 pip install chatgpt-api
 ```
-
-<br>
 
 ## Usage
 
@@ -42,8 +51,6 @@ chatgpt setup
 ```sh
 chatgpt start
 ```
-
-<br>
 
 ### As an API
 
@@ -70,8 +77,6 @@ print(response.content)
 chat.close()
 ```
 
-<br>
-
 ## How to acquire session key?
 
 After you log in to ChatGPT in your browser, get value of `__Secure-next-auth.session-token` cookie. In this project, this is named as a "session key".
@@ -87,13 +92,9 @@ After you log in to ChatGPT in your browser, get value of `__Secure-next-auth.se
 
 Now, you can use it in CLI or directly from Python code.
 
-<br>
-
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-<br>
 
 ## Disclaimer
 

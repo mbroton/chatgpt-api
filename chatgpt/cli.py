@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import httpx
 import typer
 from rich.console import Console
 from rich.markdown import Markdown
@@ -10,9 +11,9 @@ from rich.panel import Panel
 
 from chatgpt import exceptions
 from chatgpt.api import ChatGPT
+from chatgpt.const import PACKAGE_GH_URL
 
 
-PACKAGE_GH_URL = "https://github.com/mbroton/chatgpt-api"
 CONFIG_DIR = Path.home() / ".config" / "chatgpt_api"
 SESSION_KEY_FILE = CONFIG_DIR / "key.txt"
 
@@ -22,7 +23,7 @@ err_console = Console(stderr=True)
 
 
 @app.command()
-def setup() -> None:
+def setup():
     """Setup a chat."""
     console.print(f"Config directory: {CONFIG_DIR}")
     if not os.path.exists(CONFIG_DIR.absolute()):
@@ -47,13 +48,13 @@ def setup() -> None:
 
 
 @app.command()
-def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
+def start(response_timeout: int = 20, user_agent: str | None = None):
     """Start chatting at ChatGPT."""
     try:
         session_key = SESSION_KEY_FILE.read_text()
     except FileNotFoundError:
         err_console.print(
-            "[red bold]Config file doesn't exist. Use `aichat setup` command."
+            "[red bold]Config file doesn't exist. Use `chatgpt setup` command."
         )
         return
     _auth_progress = console.status("[bold green]Authenticating...")
@@ -96,7 +97,7 @@ def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
                     "Then, execute the command `chatgpt setup`."
                 )
                 return
-            except TimeoutError:
+            except httpx.ReadTimeout:
                 err_console.print(
                     "[bold red]Response timed out. ChatGPT may be overloaded, "
                     "try to increase timeout using `--response_timeout` "
@@ -104,8 +105,3 @@ def start(response_timeout: int = 20, user_agent: str | None = None) -> None:
                 )
                 continue
             console.print(Panel(Markdown(response.content)))
-
-
-def main() -> int:
-    app()
-    return 0

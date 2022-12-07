@@ -1,10 +1,18 @@
-class StatusCodeException(ValueError):
+class APIClientException(Exception):
     pass
 
 
-class InvalidResponseException(ValueError):
+class StatusCodeException(APIClientException):
     pass
 
 
-class UnauthorizedException(ValueError):
+class InvalidResponseException(APIClientException):
+    pass
+
+
+class UnauthorizedException(APIClientException):
+    pass
+
+
+class ForbiddenException(APIClientException):
     pass
