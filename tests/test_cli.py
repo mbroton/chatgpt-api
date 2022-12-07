@@ -51,7 +51,7 @@ def test_cli_start_key_does_not_exist():
 
 
 def test_cli_start(mocker, httpx_mock, valid_response_data):
-    mocker.patch("os.path.exists", new=lambda x: True)
+    mocker.patch.object(pathlib.Path, "read_text", lambda *x, **y: None)
 
     # post
     def custom_response(request):
@@ -79,7 +79,7 @@ def test_cli_start(mocker, httpx_mock, valid_response_data):
 
 
 def test_cli_start_unauthorized_after_sending_message(mocker, httpx_mock):
-    mocker.patch("os.path.exists", new=lambda x: True)
+    mocker.patch.object(pathlib.Path, "read_text", lambda *x, **y: None)
 
     # post
     def custom_response(request):
@@ -104,7 +104,7 @@ def test_cli_start_unauthorized_after_sending_message(mocker, httpx_mock):
 
 
 def test_cli_start_read_timeout(mocker, httpx_mock):
-    mocker.patch("os.path.exists", new=lambda x: True)
+    mocker.patch.object(pathlib.Path, "read_text", lambda *x, **y: None)
 
     # post
     def custom_response(request):
@@ -127,7 +127,7 @@ def test_cli_start_read_timeout(mocker, httpx_mock):
 
 
 def test_cli_start_new_conversation_command(mocker, httpx_mock):
-    mocker.patch("os.path.exists", new=lambda x: True)
+    mocker.patch.object(pathlib.Path, "read_text", lambda *x, **y: None)
 
     # auth
     def custom_response(request):
