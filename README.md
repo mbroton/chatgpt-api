@@ -15,7 +15,7 @@
 
 This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has ~90% code coverage unlike other ChatGPT packages.
 
-![Example of Markdown](https://user-images.githubusercontent.com/50829834/205705518-a23cef55-75c7-407f-bb4f-500bffc1ede7.png)
+![Long Demo GIF](https://user-images.githubusercontent.com/50829834/206066495-2ed2ae06-899a-41df-8d9e-b1dfc048cfaa.gif)
 
 
 ## Status
