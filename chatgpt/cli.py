@@ -100,7 +100,7 @@ def start(response_timeout: int = 20, user_agent: str | None = None):
             except httpx.ReadTimeout:
                 err_console.print(
                     "[bold red]Response timed out. ChatGPT may be overloaded, "
-                    "try to increase timeout using `--response_timeout` "
+                    "try to increase timeout using `--response-timeout` "
                     "argument.\nIf it won't help, try again later."
                 )
                 continue
