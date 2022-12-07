@@ -110,7 +110,7 @@ class ChatGPT(httpx.Client):
             parent_msg_id=self._parent_message_id,
         )
         response = self.post(
-            self._CONV_URL, headers=self._chatgpt_headers, data=data
+            self._CONV_URL, headers=self._chatgpt_headers, content=data
         )
 
         if response.status_code == 401:
