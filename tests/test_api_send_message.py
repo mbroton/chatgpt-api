@@ -16,19 +16,20 @@ def test_api_send_message_valid(
 
     httpx_mock.add_callback(custom_response, url=api.ChatGPT._CONV_URL)
     response = chatgpt_authenticated.send_message("foo")
-    assert response.content == "Avocado"
+    assert response.content == "Message"
     assert response.id == "123"
     assert response.conversation_id == "234"
     assert response.parent_message_id == "123"
 
 
-def test_api_new_conversation(
-    httpx_mock, chatgpt_authenticated, valid_response_data
-):
+def test_api_new_conversation(httpx_mock, chatgpt_authenticated):
+    with open("tests/valid_response_test_data.txt") as f:
+        response_text = f.read()
+
     def custom_response(request):
         return httpx.Response(
             status_code=200,
-            content=valid_response_data,
+            content=response_text,
         )
 
     httpx_mock.add_callback(custom_response, url=api.ChatGPT._CONV_URL)
@@ -46,9 +47,7 @@ def test_api_send_message_not_authenticated(chatgpt):
         chatgpt.send_message("foo")
 
 
-def test_api_send_message_invalid_401_status_code(
-    httpx_mock, chatgpt_authenticated
-):
+def test_api_send_message_invalid_401_status_code(httpx_mock, chatgpt_authenticated):
     def custom_response(request):
         return httpx.Response(status_code=401)
 

@@ -2,6 +2,6 @@ data: {"message": {"id": "123", "role": "assistant", "user": null, "create_time"
 
 data: {"message": {"id": "123", "role": "assistant", "user": null, "create_time": null, "update_time": null, "content": {"content_type": "text", "parts": ["abcdef"]}, "end_turn": null, "weight": 1.0, "metadata": {}, "recipient": "all"}, "conversation_id": "234", "error": null}
 
-data: {"message": {"id": "123", "role": "assistant", "user": null, "create_time": null, "update_time": null, "content": {"content_type": "text", "parts": ["Avocado"]}, "end_turn": null, "weight": 1.0, "metadata": {}, "recipient": "all"}, "conversation_id": "234", "error": null}
+data: {"message": {"id": "123", "role": "assistant", "user": null, "create_time": null, "update_time": null, "content": {"content_type": "text", "parts": ["Message"]}, "end_turn": null, "weight": 1.0, "metadata": {}, "recipient": "all"}, "conversation_id": "234", "error": null}
 
 data: [DONE]

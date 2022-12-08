@@ -4,12 +4,14 @@ import json
 import re
 import typing
 import uuid
+import logging
+import time
 from dataclasses import dataclass
 
 import httpx
 
 from chatgpt import payloads
-from chatgpt.const import PACKAGE_GH_URL
+from chatgpt.const import PACKAGE_GH_URL, LOGGING_DIR
 from chatgpt.exceptions import ForbiddenException
 from chatgpt.exceptions import InvalidResponseException
 from chatgpt.exceptions import StatusCodeException
@@ -47,6 +49,7 @@ class ChatGPT(httpx.Client):
         self._parent_message_id = _generate_uuid()
         self._auth_flag = False
         self._user_agent = user_agent or self._DEFAULT_USER_AGENT
+        self.logger = self.__get_class_logger()
         kwargs["timeout"] = response_timeout
         super().__init__(**kwargs)
 
@@ -74,9 +77,7 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         self.cookies.set(self._AUTH_COOKIE_NAME, self._session_token)
-        response = self.get(
-            self._AUTH_URL, headers={"User-Agent": self._user_agent}
-        )
+        response = self.get(self._AUTH_URL, headers={"User-Agent": self._user_agent})
         if response.status_code == 403:
             raise ForbiddenException(
                 "Access forbidden. It may indicate that something "
@@ -109,9 +110,7 @@ class ChatGPT(httpx.Client):
             conv_id=self._conversation_id,
             parent_msg_id=self._parent_message_id,
         )
-        response = self.post(
-            self._CONV_URL, headers=self._chatgpt_headers, content=data
-        )
+        response = self.post(self._CONV_URL, headers=self._chatgpt_headers, data=data)
 
         if response.status_code == 401:
             raise UnauthorizedException()
@@ -132,6 +131,17 @@ class ChatGPT(httpx.Client):
             )
             self._conversation_id = resp.conversation_id
             self._parent_message_id = resp.parent_message_id
+            self.logger.info(
+                "",
+                {
+                    "timestamp": f"{time.time()}",
+                    "input": f"{message}",
+                    "output": f"{resp.content}",
+                    "id": f"{resp.id}",
+                    "conversation_id": f"{resp.conversation_id}",
+                    "parent_message_id": f"{resp.parent_message_id}",
+                },
+            )
             return resp
         except Exception as e:
             raise InvalidResponseException(response.text) from e
@@ -140,6 +150,33 @@ class ChatGPT(httpx.Client):
         """Starts new conversation."""
         self._conversation_id = None
         self._parent_message_id = _generate_uuid()
+
+    @staticmethod
+    def __get_class_logger() -> logging.Logger:
+        class __IOFormatter(logging.Formatter):
+            """Used to specify custom logging keys."""
+
+            def format(self, record):
+                record.timestamp = record.args.get("timestamp")
+                record.input = record.args.get("input")
+                record.output = record.args.get("output")
+                record.id = record.args.get("id")
+                record.conversation_id = record.args.get("conversation_id")
+                record.parent_message_id = record.args.get("parent_message_id")
+                return super().format(record)
+
+        logger = logging.getLogger("ChatGPT")
+        io_json_formatter = __IOFormatter(
+            '{"timestamp":"%(timestamp)s", "input": "%(input)s", "output": "%(output)s", "id": "%(id)s", "conversation_id": "%(conversation_id)s", "parent_message_id": "%(parent_message_id)s"}'
+        )
+        time_tuple = time.localtime(time.time())
+        time_string = time.strftime("%H:%M:%S", time_tuple)
+        logging_path = LOGGING_DIR / f"chatgpt_logs_{time_string}.log"
+        file_handler = logging.FileHandler(filename=f"{logging_path}", mode="w")
+        file_handler.setFormatter(io_json_formatter)
+        logger.addHandler(file_handler)
+        logger.setLevel(level=logging.DEBUG)
+        return logger
 
 
 def _generate_uuid() -> str:

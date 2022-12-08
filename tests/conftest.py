@@ -5,11 +5,6 @@ from chatgpt import api
 
 
 @pytest.fixture
-def assert_all_responses_were_requested() -> bool:
-    return True
-
-
-@pytest.fixture
 def session_token():
     return "abf7194fa9c841dfb9e57fd86b00c189"
 

@@ -5,7 +5,7 @@
 <p align="center">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/chatgpt-api">
     <img alt="License" src="https://img.shields.io/github/license/mbroton/chatgpt-api">
-    <img alt="Coverage" src="https://img.shields.io/badge/coverage-100%25-green">
+    <img alt="Coverage" src="https://img.shields.io/badge/coverage-85%25-green">
 </p>
 <br>
 
@@ -13,26 +13,31 @@
 
 <br>
 
-This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has 100% code coverage unlike other ChatGPT packages.
+This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has ~90% code coverage unlike other ChatGPT packages.
 
 ![Long Demo GIF](https://user-images.githubusercontent.com/50829834/206066495-2ed2ae06-899a-41df-8d9e-b1dfc048cfaa.gif)
 
 
 ## Status
 
-ChatGPT API often changes. We're trying to make updates as soon as possible. So, if something is not working properly and you recently didn't upgrade `chatgpt-api`, try to do this first:
+ChatGPT API often changes. I'm trying to make updates as soon as possible. So, if something is not working properly and you recently didn't upgrade `chatgpt-api`, try to do this first:
 
 ```sh
 pip install --upgrade chatgpt-api
 ```
 
-If that doesn't help, please open an [issue](https://github.com/mbroton/chatgpt-api/issues).
+If that doesn't help, please open an issue.
 
 
 ## Installation
-
+### From Pypi
 ```
 pip install chatgpt-api
+```
+
+### Source code
+```sh
+pip install -r requirements.txt && pip install .
 ```
 
 ## Usage
@@ -41,9 +46,21 @@ pip install chatgpt-api
 
 #### Setup
 
-Required to authenticate. In this step you have to provide session key.
+Required to authenticate. In this step you have to provide a path to the file containing the session key. A simple txt file with the key only is enough.
 ```sh
 chatgpt setup
+```
+
+*Tip: Use a file named .session_key in chatgpt-api top directory. It will be ignored by git - see .gitignore.*
+
+The key will be saved to
+```python
+Path.home() / ".chatgpt_api" / "config"
+```
+
+Session messages are logged to
+```python
+Path.home() / ".chatgpt_api" / "logs"
 ```
 
 #### Start chatting
@@ -98,4 +115,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Disclaimer
 
-This is a personal project, not affiliated in any way with OpenAI. If you have any objections, please contact @mbroton.
+This is a personal project, not affiliated in any way with OpenAI. If you have any objections, please contact me.
