@@ -26,7 +26,7 @@ def test_cli_setup_config_file_does_not_exist_and_create(mocker):
     mocker.patch.object(pathlib.Path, "write_text", lambda *x, **y: None)
     result = runner.invoke(app, ["setup"], input="y\nfile_path_key\n")
     assert result.exit_code == 0
-    assert 'created' in result.stdout
+    assert "created" in result.stdout
 
 
 def test_cli_setup_config_file_does_not_exist_and_do_not_create(mocker):
