@@ -26,12 +26,12 @@ def setup():
     console.print(f"Config directory: {CONFIG_DIR}")
     if not CONFIG_DIR.exists():
         create = typer.confirm(
-            "Config directory does not exist. "
+            "Config directory does not exist."
             "It is required to save authentication data. Confirm to create"
         )
         if create:
             CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-            console.print(f"[green]Directory {CONFIG_DIR} created")
+            console.print(f"[green]Directory {CONFIG_DIR} successfully created")
         else:
             err_console.print("[red bold]Could not configure chat.")
             return
