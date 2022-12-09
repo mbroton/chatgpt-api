@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from pathlib import Path
 
 import httpx
@@ -9,7 +10,7 @@ from rich.panel import Panel
 
 from chatgpt import exceptions
 from chatgpt.api import ChatGPT
-from chatgpt.const import PACKAGE_GH_URL, LOGGING_DIR
+from chatgpt.const import PACKAGE_GH_URL
 
 
 CONFIG_DIR = Path.home() / ".chatgpt_api" / "config"
@@ -31,7 +32,9 @@ def setup():
         )
         if create:
             CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-            console.print(f"[green]Directory {CONFIG_DIR} successfully created")
+            console.print(
+                f"[green]Directory {CONFIG_DIR} successfully created"
+            )
         else:
             err_console.print("[red bold]Could not configure chat.")
             return
@@ -40,7 +43,9 @@ def setup():
         "If you don't know how to obtain it, "
         f"visit {PACKAGE_GH_URL}\n"
     )
-    file_path_key = typer.prompt("File path with session key:\n", prompt_suffix="")
+    file_path_key = typer.prompt(
+        "File path with session key:\n", prompt_suffix=""
+    )
     SESSION_KEY_FILE.write_text(Path(file_path_key).read_text().strip())
     console.print("[bold green]Configuration saved![/]")
 

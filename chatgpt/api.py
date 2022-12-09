@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
+import time
 import typing
 import uuid
-import logging
-import time
 from dataclasses import dataclass
 
 import httpx
 
 from chatgpt import payloads
-from chatgpt.const import PACKAGE_GH_URL, LOGGING_DIR
+from chatgpt.const import LOGGING_DIR
+from chatgpt.const import PACKAGE_GH_URL
 from chatgpt.exceptions import ForbiddenException
 from chatgpt.exceptions import InvalidResponseException
 from chatgpt.exceptions import StatusCodeException
@@ -77,7 +78,9 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         self.cookies.set(self._AUTH_COOKIE_NAME, self._session_token)
-        response = self.get(self._AUTH_URL, headers={"User-Agent": self._user_agent})
+        response = self.get(
+            self._AUTH_URL, headers={"User-Agent": self._user_agent}
+        )
         if response.status_code == 403:
             raise ForbiddenException(
                 "Access forbidden. It may indicate that something "
@@ -110,7 +113,9 @@ class ChatGPT(httpx.Client):
             conv_id=self._conversation_id,
             parent_msg_id=self._parent_message_id,
         )
-        response = self.post(self._CONV_URL, headers=self._chatgpt_headers, data=data)
+        response = self.post(
+            self._CONV_URL, headers=self._chatgpt_headers, data=data
+        )
 
         if response.status_code == 401:
             raise UnauthorizedException()
@@ -167,14 +172,19 @@ class ChatGPT(httpx.Client):
 
         logger = logging.getLogger("ChatGPT")
         io_json_formatter = __IOFormatter(
-            '{"timestamp":"%(timestamp)s", "input": "%(input)s", "output": "%(output)s", "id": "%(id)s", "conversation_id": "%(conversation_id)s", "parent_message_id": "%(parent_message_id)s"}'
+            '{"timestamp":"%(timestamp)s",\
+            "input": "%(input)s", "output": "%(output)s",\
+            "id": "%(id)s", "conversation_id": "%(conversation_id)s",\
+            "parent_message_id": "%(parent_message_id)s"}'
         )
         time_tuple = time.localtime(time.time())
         time_string = time.strftime("%H:%M:%S", time_tuple)
         if not LOGGING_DIR.exists():
             LOGGING_DIR.mkdir(parents=True, exist_ok=True)
         logging_path = LOGGING_DIR / f"chatgpt_logs_{time_string}.log"
-        file_handler = logging.FileHandler(filename=f"{logging_path}", mode="w")
+        file_handler = logging.FileHandler(
+            filename=f"{logging_path}", mode="w"
+        )
         file_handler.setFormatter(io_json_formatter)
         logger.addHandler(file_handler)
         logger.setLevel(level=logging.DEBUG)

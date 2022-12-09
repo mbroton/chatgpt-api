@@ -66,7 +66,9 @@ def test_api_invalid_authentication_cookie_not_set(httpx_mock, chatgpt):
         chatgpt.authenticate()
 
 
-def test_api_invalid_authentication_access_token_not_found(httpx_mock, chatgpt):
+def test_api_invalid_authentication_access_token_not_found(
+    httpx_mock, chatgpt
+):
     def custom_response(request):
         return httpx.Response(
             status_code=200,

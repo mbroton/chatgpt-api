@@ -47,7 +47,9 @@ def test_api_send_message_not_authenticated(chatgpt):
         chatgpt.send_message("foo")
 
 
-def test_api_send_message_invalid_401_status_code(httpx_mock, chatgpt_authenticated):
+def test_api_send_message_invalid_401_status_code(
+    httpx_mock, chatgpt_authenticated
+):
     def custom_response(request):
         return httpx.Response(status_code=401)
 
