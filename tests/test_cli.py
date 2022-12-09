@@ -9,11 +9,11 @@ runner = CliRunner()
 
 
 def test_cli_setup_config_file_exist(mocker):
-    mocker.patch("os.path.exists", new=lambda x: True)
+    mocker.patch("pathlib.Path.exists", new=lambda x: True)
     mocker.patch.object(pathlib.Path, "write_text", lambda *x, **y: None)
     mocker.patch.object(pathlib.Path, "read_text", lambda *x, **y: "abc123")
     mocker.patch.object(pathlib.Path, "mkdir", lambda *x, **y: None)
-    result = runner.invoke(app, ["setup"], input="file_path_key")
+    result = runner.invoke(app, ["setup"], input="file_path_key\n")
     assert result.exit_code == 0
     assert "Session key is required for chatting." in result.stdout
     assert "Configuration saved" in result.stdout

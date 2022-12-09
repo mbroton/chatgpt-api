@@ -171,6 +171,8 @@ class ChatGPT(httpx.Client):
         )
         time_tuple = time.localtime(time.time())
         time_string = time.strftime("%H:%M:%S", time_tuple)
+        if not LOGGING_DIR.exists():
+            LOGGING_DIR.mkdir(parents=True, exist_ok=True)
         logging_path = LOGGING_DIR / f"chatgpt_logs_{time_string}.log"
         file_handler = logging.FileHandler(filename=f"{logging_path}", mode="w")
         file_handler.setFormatter(io_json_formatter)

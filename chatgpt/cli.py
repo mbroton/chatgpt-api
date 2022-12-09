@@ -26,7 +26,7 @@ def setup():
     console.print(f"Config directory: {CONFIG_DIR}")
     if not CONFIG_DIR.exists():
         create = typer.confirm(
-            "Config directory does not exist."
+            "Config directory does not exist.\n"
             "It is required to save authentication data. Confirm to create"
         )
         if create:
@@ -43,9 +43,6 @@ def setup():
     file_path_key = typer.prompt("File path with session key:\n", prompt_suffix="")
     SESSION_KEY_FILE.write_text(Path(file_path_key).read_text().strip())
     console.print("[bold green]Configuration saved![/]")
-    if not LOGGING_DIR.exists():
-        LOGGING_DIR.mkdir(parents=True, exist_ok=True)
-        console.print(f"[green]Session is logged in {LOGGING_DIR}.")
 
 
 @app.command()
