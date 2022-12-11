@@ -140,11 +140,11 @@ class ChatGPT(httpx.Client):
                 "",
                 {
                     "timestamp": f"{time.time()}",
-                    "input": f"{message}",
-                    "output": f"{resp.content}",
-                    "id": f"{resp.id}",
-                    "conversation_id": f"{resp.conversation_id}",
-                    "parent_message_id": f"{resp.parent_message_id}",
+                    "input": message,
+                    "output": resp.content,
+                    "id": resp.id,
+                    "conversation_id": resp.conversation_id,
+                    "parent_message_id": resp.parent_message_id,
                 },
             )
             return resp
@@ -183,7 +183,7 @@ class ChatGPT(httpx.Client):
             LOGGING_DIR.mkdir(parents=True, exist_ok=True)
         logging_path = LOGGING_DIR / f"chatgpt_logs_{time_string}.log"
         file_handler = logging.FileHandler(
-            filename=f"{logging_path}", mode="w"
+            filename=str(logging_path), mode="w"
         )
         file_handler.setFormatter(io_json_formatter)
         logger.addHandler(file_handler)

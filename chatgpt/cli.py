@@ -13,8 +13,8 @@ from chatgpt.api import ChatGPT
 from chatgpt.const import PACKAGE_GH_URL
 
 
-CONFIG_DIR = Path.home() / ".chatgpt_api" / "config"
-SESSION_KEY_FILE = CONFIG_DIR / "key.txt"
+CHATGPT_DIR = Path.home() / ".chatgpt_api"
+SESSION_KEY_FILE = CHATGPT_DIR / "key.txt"
 
 app = typer.Typer()
 console = Console()
@@ -24,20 +24,6 @@ err_console = Console(stderr=True)
 @app.command()
 def setup():
     """Setup a chat."""
-    console.print(f"Config directory: {CONFIG_DIR}")
-    if not CONFIG_DIR.exists():
-        create = typer.confirm(
-            "Config directory does not exist.\n"
-            "It is required to save authentication data. Confirm to create"
-        )
-        if create:
-            CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-            console.print(
-                f"[green]Directory {CONFIG_DIR} successfully created"
-            )
-        else:
-            err_console.print("[red bold]Could not configure chat.")
-            return
     console.print(
         "Session key is required for chatting. "
         "If you don't know how to obtain it, "
@@ -46,6 +32,12 @@ def setup():
     file_path_key = typer.prompt(
         "File path with session key:\n", prompt_suffix=""
     )
+    if not CHATGPT_DIR.exists():
+        CHATGPT_DIR.mkdir(parents=True, exist_ok=True)
+        console.print(
+            f"[bold green]Created {CHATGPT_DIR}."
+            "The key and logs are saved there."
+        )
     SESSION_KEY_FILE.write_text(Path(file_path_key).read_text().strip())
     console.print("[bold green]Configuration saved![/]")
 

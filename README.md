@@ -5,7 +5,7 @@
 <p align="center">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/chatgpt-api">
     <img alt="License" src="https://img.shields.io/github/license/mbroton/chatgpt-api">
-    <img alt="Coverage" src="https://img.shields.io/badge/coverage-85%25-green">
+    <img alt="Coverage" src="https://img.shields.io/badge/coverage-100%25-green">
 </p>
 <br>
 
@@ -13,21 +13,20 @@
 
 <br>
 
-This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has ~90% code coverage unlike other ChatGPT packages.
+This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has 100% code coverage unlike other ChatGPT packages.
 
 ![Long Demo GIF](https://user-images.githubusercontent.com/50829834/206066495-2ed2ae06-899a-41df-8d9e-b1dfc048cfaa.gif)
 
 
 ## Status
 
-ChatGPT API often changes. I'm trying to make updates as soon as possible. So, if something is not working properly and you recently didn't upgrade `chatgpt-api`, try to do this first:
+ChatGPT API often changes. We're trying to make updates as soon as possible. So, if something is not working properly and you recently didn't upgrade `chatgpt-api`, try to do this first:
 
 ```sh
 pip install --upgrade chatgpt-api
 ```
 
-If that doesn't help, please open an issue.
-
+If that doesn't help, please open an [issue](https://github.com/mbroton/chatgpt-api/issues).
 
 ## Installation
 ### From Pypi
@@ -55,7 +54,7 @@ chatgpt setup
 
 The key will be saved to
 ```python
-Path.home() / ".chatgpt_api" / "config"
+Path.home() / ".chatgpt_api" / "key.txt"
 ```
 
 Session messages are logged to
@@ -115,4 +114,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Disclaimer
 
-This is a personal project, not affiliated in any way with OpenAI. If you have any objections, please contact me.
+This is a personal project, not affiliated in any way with OpenAI. If you have any objections, contact @mbroton.
