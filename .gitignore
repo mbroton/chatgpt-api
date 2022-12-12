@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # Others
-.session_key
+*key*.txt
 
 #MacOS files
 .DS_Store
