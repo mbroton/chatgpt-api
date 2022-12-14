@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
+from chatgpt import browser
 from chatgpt import exceptions
 from chatgpt.api import ChatGPT
 from chatgpt.const import PACKAGE_GH_URL
@@ -31,14 +32,38 @@ def setup():
     file_path_key = typer.prompt(
         "File path with session key:\n", prompt_suffix=""
     )
+    file_key = Path(file_path_key)
+    if not file_key.exists():
+        console.print("[bold red]Given path does not exist.")
+        return
     if not CHATGPT_DIR.exists():
         CHATGPT_DIR.mkdir(parents=True, exist_ok=True)
         console.print(
             f"[bold green]Created {CHATGPT_DIR}."
             "The key and logs are saved there."
         )
-    SESSION_KEY_FILE.write_text(Path(file_path_key).read_text().strip())
-    console.print("[bold green]Configuration saved![/]")
+    SESSION_KEY_FILE.write_text(file_key.read_text().strip())
+    console.print("[bold green]Configuration saved![/]\n")
+    console.print(
+        "Browser drivers are required to make authentication works.\n"
+        "Installation is handled by `Playwright`."
+    )
+    install_drivers = typer.confirm("Confirm to install")
+    if install_drivers:
+        try:
+            with console.status("[bold green]Installing drivers"):
+                browser.install()
+            console.print(
+                "[bold green]Browser drivers installed successfully!"
+            )
+        except RuntimeError:
+            console.print("[bold red]Installation failed.")
+            return
+    else:
+        console.print(
+            "Browser drivers are not installed.\n"
+            "Authentication process may not work properly."
+        )
 
 
 @app.command()
