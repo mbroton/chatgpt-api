@@ -1,12 +1,11 @@
-from __future__ import annotations
-
 import json
 import logging
 import re
 import time
-import typing
 import uuid
 from dataclasses import dataclass
+from typing import Any
+from typing import Union
 
 import httpx
 
@@ -41,12 +40,12 @@ class ChatGPT(httpx.Client):
         *,
         session_token: str,
         response_timeout: int = 10,
-        user_agent: str | None = None,
-        **kwargs: typing.Any,
+        user_agent: Union[str, None] = None,
+        **kwargs: Any,
     ) -> None:
         self._session_token = session_token
         self._access_token = None
-        self._conversation_id: str | None = None
+        self._conversation_id: Union[str, None] = None
         self._parent_message_id = _generate_uuid()
         self._auth_flag = False
         self._user_agent = user_agent or self._DEFAULT_USER_AGENT
@@ -55,7 +54,7 @@ class ChatGPT(httpx.Client):
         super().__init__(**kwargs)
 
     @property
-    def conversation_id(self) -> str | None:
+    def conversation_id(self) -> Union[str, None]:
         return self._conversation_id
 
     @property
