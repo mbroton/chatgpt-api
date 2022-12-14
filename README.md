@@ -28,11 +28,15 @@ pip install --upgrade chatgpt-api
 
 If that doesn't help, please open an [issue](https://github.com/mbroton/chatgpt-api/issues).
 
-
 ## Installation
-
+### From Pypi
 ```
 pip install chatgpt-api
+```
+
+### Source code
+```sh
+pip install -r requirements.txt && pip install .
 ```
 
 ## Usage
@@ -41,9 +45,21 @@ pip install chatgpt-api
 
 #### Setup
 
-Required to authenticate. In this step you have to provide session key.
+Required to authenticate. In this step you have to provide a path to the file containing the session key. A simple txt file with the key only is enough.
 ```sh
 chatgpt setup
+```
+
+*Tip: Use a file named .session_key in chatgpt-api top directory. It will be ignored by git - see .gitignore.*
+
+The key will be saved to
+```python
+Path.home() / ".chatgpt_api" / "key.txt"
+```
+
+Session messages are logged to
+```python
+Path.home() / ".chatgpt_api" / "logs"
 ```
 
 #### Start chatting
@@ -98,4 +114,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Disclaimer
 
-This is a personal project, not affiliated in any way with OpenAI. If you have any objections, please contact @mbroton.
+This is a personal project, not affiliated in any way with OpenAI. If you have any objections, contact @mbroton.

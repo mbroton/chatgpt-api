@@ -10,36 +10,12 @@ from chatgpt.cli import app
 runner = CliRunner()
 
 
-def test_cli_setup_config_file_exist(mocker):
-    mocker.patch("os.path.exists", new=lambda x: True)
-    mocker.patch.object(pathlib.Path, "write_text", lambda *x, **y: None)
-    result = runner.invoke(app, ["setup"], input="abc123")
-    assert result.exit_code == 0
-    assert "Session key is required for chatting." in result.stdout
-    assert "Configuration saved" in result.stdout
+def test_cli_setup_chatgpt_dir_exist(mocker):
+    """Test flow when CHATGPT_DIR exists"""
 
 
-def test_cli_setup_config_file_does_not_exist_and_create(mocker):
-    mocker.patch("os.path.exists", new=lambda x: False)
-    mocker.patch.object(pathlib.Path, "mkdir", lambda *a, **kw: None)
-    mocker.patch.object(pathlib.Path, "write_text", lambda *x, **y: None)
-    result = runner.invoke(app, ["setup"], input="y\n123")
-    assert result.exit_code == 0
-    assert "Config directory does not exist." in result.stdout
-    assert "Confirm to create" in result.stdout
-    assert "Session key is required for chatting." in result.stdout
-    assert "Configuration saved" in result.stdout
-
-
-def test_cli_setup_config_file_does_not_exist_and_do_not_create(mocker):
-    mocker.patch("os.path.exists", new=lambda x: False)
-    mocker.patch.object(pathlib.Path, "mkdir", lambda *a, **kw: None)
-    mocker.patch.object(pathlib.Path, "write_text", lambda *x, **y: None)
-    result = runner.invoke(app, ["setup"], input="n")
-    assert result.exit_code == 0
-    assert "Config directory does not exist." in result.stdout
-    assert "Confirm to create" in result.stdout
-    assert "Could not configure chat." in result.stdout
+def test_cli_setup_chatgpt_dir_does_not_exist_and_create(mocker):
+    """Test flow when CHATGPT_DIR does not exist"""
 
 
 def test_cli_start_key_does_not_exist():
