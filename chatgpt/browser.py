@@ -35,10 +35,10 @@ def login(
     with sync_playwright() as p:
         if remember:
             browser = p.chromium.launch_persistent_context(
-                config.BROWSER_DATA, headless=headless
+                config.BROWSER_DATA, headless=False
             )
         else:
-            browser = p.chromium.launch(headless=headless)
+            browser = p.chromium.launch(headless=False)
         page = browser.new_page()
         sync_stealth(page, pure=False)
         page.goto("https://chat.openai.com/")
