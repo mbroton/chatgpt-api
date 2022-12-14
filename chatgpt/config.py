@@ -4,8 +4,18 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-ROOT = Path.home() / ".chatgpt"
+# Paths
+ROOT = Path.home() / ".chatgpt_api"
+LOGGING_DIR = ROOT / "logs"
 AUTH_FILE = ROOT / ".auth_data.json"
+
+# Package URLs
+PACKAGE_GH_URL = "https://github.com/mbroton/chatgpt-api"
+
+# ChatGPT related consts
+AUTH_URL = "https://chat.openai.com/api/auth/session"
+CONV_URL = "https://chat.openai.com/backend-api/conversation"
+AUTH_COOKIE_NAME = "__Secure-next-auth.session-token"
 
 
 @dataclass

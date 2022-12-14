@@ -10,7 +10,7 @@ from rich.panel import Panel
 from chatgpt import browser
 from chatgpt import exceptions
 from chatgpt.api import ChatGPT
-from chatgpt.const import PACKAGE_GH_URL
+from chatgpt.config import PACKAGE_GH_URL
 
 
 CHATGPT_DIR = Path.home() / ".chatgpt_api"

@@ -1,5 +1,4 @@
 import json
-import logging
 import re
 import time
 import uuid
@@ -10,12 +9,12 @@ from typing import Union
 import httpx
 
 from chatgpt import browser
-from chatgpt import payloads
-from chatgpt.const import LOGGING_DIR
+from chatgpt import config
 from chatgpt.exceptions import APIClientException
 from chatgpt.exceptions import InvalidResponseException
 from chatgpt.exceptions import StatusCodeException
 from chatgpt.exceptions import UnauthorizedException
+from chatgpt.logger import _get_logger
 
 
 @dataclass
@@ -27,10 +26,6 @@ class Response:
 
 
 class ChatGPT(httpx.Client):
-    _AUTH_URL = "https://chat.openai.com/api/auth/session"
-    _CONV_URL = "https://chat.openai.com/backend-api/conversation"
-    _AUTH_COOKIE_NAME = "__Secure-next-auth.session-token"
-
     def __init__(
         self,
         *,
@@ -43,7 +38,7 @@ class ChatGPT(httpx.Client):
         self._conversation_id: Union[str, None] = None
         self._parent_message_id = _generate_uuid()
         self._auth_flag = False
-        self.logger = self.__get_class_logger()
+        self._logger = _get_logger()
         kwargs["timeout"] = response_timeout
         super().__init__(**kwargs)
 
@@ -79,14 +74,14 @@ class ChatGPT(httpx.Client):
                 "Authentication via browser failed."
             ) from e
         self.cookies.set("cf_clearance", auth_data.cf_clearance)
-        self.cookies.set(self._AUTH_COOKIE_NAME, auth_data.session_token)
+        self.cookies.set(config.AUTH_COOKIE_NAME, auth_data.session_token)
         self.__headers["User-Agent"] = auth_data.user_agent
 
         headers = {
             "User-Agent": auth_data.user_agent,
         }
         res = self.get(
-            self._AUTH_URL,
+            config.AUTH_URL,
             headers=headers,
         )
         if "<title>Please Wait... | Cloudflare</title>" in res.text:
@@ -103,11 +98,23 @@ class ChatGPT(httpx.Client):
                 "In order to send messages you have to authenticate first."
             )
 
-        data = payloads.send_message(
-            message,
-            id_=_generate_uuid(),
-            conv_id=self._conversation_id,
-            parent_msg_id=self._parent_message_id,
+        data = json.dumps(
+            {
+                "action": "next",
+                "messages": [
+                    {
+                        "id": _generate_uuid(),
+                        "role": "user",
+                        "content": {
+                            "content_type": "text",
+                            "parts": [message],
+                        },
+                    }
+                ],
+                "conversation_id": self._conversation_id,
+                "parent_message_id": self._parent_message_id,
+                "model": "text-davinci-002-render",
+            }
         )
 
         print("HEADERS")
@@ -120,7 +127,7 @@ class ChatGPT(httpx.Client):
             print(c)
 
         response = self.post(
-            self._CONV_URL,
+            config.CONV_URL,
             content=data,
             headers=self.__headers,
         )
@@ -147,7 +154,7 @@ class ChatGPT(httpx.Client):
             )
             self._conversation_id = resp.conversation_id
             self._parent_message_id = resp.parent_message_id
-            self.logger.info(
+            self._logger.info(
                 "",
                 {
                     "timestamp": f"{time.time()}",
@@ -166,40 +173,6 @@ class ChatGPT(httpx.Client):
         """Starts new conversation."""
         self._conversation_id = None
         self._parent_message_id = _generate_uuid()
-
-    @staticmethod
-    def __get_class_logger() -> logging.Logger:
-        class __IOFormatter(logging.Formatter):
-            """Used to specify custom logging keys."""
-
-            def format(self, record):
-                record.timestamp = record.args.get("timestamp")
-                record.input = record.args.get("input")
-                record.output = record.args.get("output")
-                record.id = record.args.get("id")
-                record.conversation_id = record.args.get("conversation_id")
-                record.parent_message_id = record.args.get("parent_message_id")
-                return super().format(record)
-
-        logger = logging.getLogger("ChatGPT")
-        io_json_formatter = __IOFormatter(
-            '{"timestamp":"%(timestamp)s",\
-            "input": "%(input)s", "output": "%(output)s",\
-            "id": "%(id)s", "conversation_id": "%(conversation_id)s",\
-            "parent_message_id": "%(parent_message_id)s"}'
-        )
-        time_tuple = time.localtime(time.time())
-        time_string = time.strftime("%H:%M:%S", time_tuple)
-        if not LOGGING_DIR.exists():
-            LOGGING_DIR.mkdir(parents=True, exist_ok=True)
-        logging_path = LOGGING_DIR / f"chatgpt_logs_{time_string}.log"
-        file_handler = logging.FileHandler(
-            filename=str(logging_path), mode="w"
-        )
-        file_handler.setFormatter(io_json_formatter)
-        logger.addHandler(file_handler)
-        logger.setLevel(level=logging.DEBUG)
-        return logger
 
 
 def _generate_uuid() -> str:
