@@ -42,6 +42,8 @@ def login(
             raise Exception("challenge fail")
         if not headless:
             page.wait_for_url("https://chat.openai.com/chat", timeout=360_000)
+        else:
+            page.goto("https://chat.openai.com/chat")
         cookies = page.context.cookies()
         session_token = _get_cookie(
             cookies, "__Secure-next-auth.session-token"
