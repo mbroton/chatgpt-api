@@ -1,8 +1,12 @@
 import json
+from typing import Union
 
 
 def send_message(
-    message: str, id_: str, conv_id: str | None, parent_msg_id: str | None
+    message: str,
+    id_: str,
+    conv_id: Union[str, None],
+    parent_msg_id: Union[str, None],
 ) -> str:
     return json.dumps(
         {
