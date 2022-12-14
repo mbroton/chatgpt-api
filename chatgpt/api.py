@@ -46,7 +46,17 @@ class ChatGPT(httpx.Client):
         kwargs["timeout"] = response_timeout
         super().__init__(**kwargs)
 
-        self.__headers: Union[dict, None] = None
+        self.__user_agent: Union[str, None] = None
+        self.__headers = {
+            "Accept": "text/event-stream",
+            # "Authorization": "Bearer ",
+            "Content-Type": "application/json",
+            "User-Agent": self.__user_agent,
+            "X-Openai-Assistant-App-Id": "",
+            "Connection": "close",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://chat.openai.com/chat",
+        }
 
     @property
     def conversation_id(self) -> Union[str, None]:
@@ -63,14 +73,12 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         auth_data = browser.login()
-
+        self.__user_agent = auth_data.user_agent
         cookies = {
             "cf_clearance": auth_data.cf_clearance,
             self._AUTH_COOKIE_NAME: auth_data.session_token,
         }
         headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
             "User-Agent": auth_data.user_agent,
         }
         res = self.get(
@@ -80,9 +88,10 @@ class ChatGPT(httpx.Client):
         )
         if "<title>Please Wait... | Cloudflare</title>" in res.text:
             raise UnauthorizedException("cloudflare")
+
         access_token = res.json()["accessToken"]
-        self.__headers = headers
         self.__headers["Authorization"] = "Bearer {}".format(access_token)
+
         self._auth_flag = True
 
     def send_message(self, message: str) -> Response:
