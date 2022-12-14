@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 from pathlib import Path
+from typing import Union
 
 import httpx
 import typer
@@ -43,7 +42,7 @@ def setup():
 
 
 @app.command()
-def start(response_timeout: int = 20, user_agent: str | None = None):
+def start(response_timeout: int = 20, user_agent: Union[str, None] = None):
     """Start chatting at ChatGPT."""
     try:
         session_key = SESSION_KEY_FILE.read_text()
