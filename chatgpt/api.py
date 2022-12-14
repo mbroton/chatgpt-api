@@ -102,7 +102,6 @@ class ChatGPT(httpx.Client):
             self._CONV_URL,
             content=data,
             headers=self.__headers,
-            cookies=self.__cookies,
         )
 
         if response.status_code == 401:
