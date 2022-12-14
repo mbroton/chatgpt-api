@@ -2,8 +2,6 @@
 Case 1: Login with browser using email and password
 Case 2: Login on server without browser window
 """
-import contextlib
-import io
 import subprocess
 from dataclasses import dataclass
 from typing import Union
@@ -21,8 +19,11 @@ class AuthData:
 
 
 def install() -> None:
-    with contextlib.redirect_stdout(io.StringIO()):
-        proc = subprocess.run(["playwright", "install"])
+    proc = subprocess.run(
+        ["playwright", "install"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
     if proc.returncode != 0:
         raise RuntimeError
 
