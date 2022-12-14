@@ -4,10 +4,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-# Paths
+# Paths to directories
 ROOT = Path.home() / ".chatgpt_api"
-KEY_FILE = ROOT / "key.txt"
 LOGGING_DIR = ROOT / "logs"
+BROWSER_DATA = ROOT / "browser"
+
+# Paths to files
+KEY_FILE = ROOT / "key.txt"
 AUTH_FILE = ROOT / ".auth_data.json"
 
 # Package URLs
