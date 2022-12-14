@@ -42,7 +42,7 @@ def login() -> AuthData:
         res = sync_cf_retry(page)
         if not res:
             raise Exception("challenge fail")
-        page.wait_for_url("https://chat.openai.com/chat", timeout=120)
+        page.wait_for_url("https://chat.openai.com/chat", timeout=120_000)
         cookies = page.context.cookies()
         session_token = _get_cookie(
             cookies, "__Secure-next-auth.session-token"
