@@ -46,12 +46,11 @@ class ChatGPT(httpx.Client):
         kwargs["timeout"] = response_timeout
         super().__init__(**kwargs)
 
-        self.__user_agent: Union[str, None] = None
         self.__headers = {
             "Accept": "text/event-stream",
             # "Authorization": "Bearer ",
             "Content-Type": "application/json",
-            "User-Agent": self.__user_agent,
+            # "User-Agent": self.__user_agent,
             "X-Openai-Assistant-App-Id": "",
             "Connection": "close",
             "Accept-Language": "en-US,en;q=0.9",
@@ -73,10 +72,7 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         auth_data = browser.login()
-        print(auth_data)
-        print(auth_data)
-        print(auth_data)
-        self.__user_agent = auth_data.user_agent
+        self.__headers["User-Agent"] = auth_data.user_agent
         cookies = {
             "cf_clearance": auth_data.cf_clearance,
             self._AUTH_COOKIE_NAME: auth_data.session_token,
