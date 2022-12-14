@@ -77,6 +77,8 @@ class ChatGPT(httpx.Client):
             "cf_clearance": auth_data.cf_clearance,
             self._AUTH_COOKIE_NAME: auth_data.session_token,
         }
+        for k, v in cookies.items():
+            self.cookies.set(k, v)
         headers = {
             "User-Agent": auth_data.user_agent,
         }
