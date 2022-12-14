@@ -28,12 +28,17 @@ def _get_cookie(cookies: list, name: str) -> Union[str, None]:
 
 
 def login(
-    headless: bool = False, session_token: Union[str, None] = None
+    headless: bool = False,
+    remember: bool = False,
+    session_token: Union[str, None] = None,
 ) -> config.AuthData:
     with sync_playwright() as p:
-        browser = p.chromium.launch_persistent_context(
-            config.BROWSER_DATA, headless=False
-        )
+        if remember:
+            browser = p.chromium.launch_persistent_context(
+                config.BROWSER_DATA, headless=headless
+            )
+        else:
+            browser = p.chromium.launch(headless=headless)
         page = browser.new_page()
         sync_stealth(page, pure=False)
         page.goto("https://chat.openai.com/")
