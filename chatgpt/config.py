@@ -6,6 +6,7 @@ from pathlib import Path
 
 # Paths
 ROOT = Path.home() / ".chatgpt_api"
+KEY_FILE = ROOT / "key.txt"
 LOGGING_DIR = ROOT / "logs"
 AUTH_FILE = ROOT / ".auth_data.json"
 

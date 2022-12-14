@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Union
 
 import httpx
 import typer
@@ -8,13 +7,10 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 
 from chatgpt import browser
+from chatgpt import config
 from chatgpt import exceptions
 from chatgpt.api import ChatGPT
-from chatgpt.config import PACKAGE_GH_URL
 
-
-CHATGPT_DIR = Path.home() / ".chatgpt_api"
-SESSION_KEY_FILE = CHATGPT_DIR / "key.txt"
 
 app = typer.Typer()
 console = Console()
@@ -27,7 +23,7 @@ def setup():
     console.print(
         "Session key is required for chatting. "
         "If you don't know how to obtain it, "
-        f"visit {PACKAGE_GH_URL}\n"
+        f"visit {config.PACKAGE_GH_URL}\n"
     )
     file_path_key = typer.prompt(
         "File path with session key:\n", prompt_suffix=""
@@ -36,13 +32,13 @@ def setup():
     if not file_key.exists():
         console.print("[bold red]Given path does not exist.")
         return
-    if not CHATGPT_DIR.exists():
-        CHATGPT_DIR.mkdir(parents=True, exist_ok=True)
+    if not config.ROOT.exists():
+        config.ROOT.mkdir(parents=True, exist_ok=True)
         console.print(
-            f"[bold green]Created {CHATGPT_DIR}."
+            f"[bold green]Created {config.ROOT}."
             "The key and logs are saved there."
         )
-    SESSION_KEY_FILE.write_text(file_key.read_text().strip())
+    config.KEY_FILE.write_text(file_key.read_text().strip())
     console.print("[bold green]Configuration saved![/]\n")
     console.print(
         "Browser drivers are required to make authentication works.\n"
@@ -67,19 +63,22 @@ def setup():
 
 
 @app.command()
-def start(response_timeout: int = 20, user_agent: Union[str, None] = None):
+def start(headless: bool = False, response_timeout: int = 20):
     """Start chatting at ChatGPT."""
-    try:
-        session_key = SESSION_KEY_FILE.read_text()
-    except FileNotFoundError:
-        err_console.print(
-            "[red bold]Config file doesn't exist. Use `chatgpt setup` command."
-        )
-        return
+    if headless:
+        try:
+            session_key = config.KEY_FILE.read_text()
+        except FileNotFoundError:
+            err_console.print(
+                "[red bold]Config file doesn't exist. "
+                "Use `chatgpt setup` command."
+            )
+            return
+
     _auth_progress = console.status("[bold green]Authenticating...")
     _auth_progress.start()
     with ChatGPT(
-        session_token=session_key,
+        session_token=session_key if headless else None,
         response_timeout=response_timeout,
     ) as chat:
         _auth_progress.stop()
@@ -111,7 +110,7 @@ def start(response_timeout: int = 20, user_agent: Union[str, None] = None):
                 err_console.print(
                     "[bold red]Unauthorized. Probably your session "
                     "key expired.\nTo generate a new key, "
-                    f"follow instructions at {PACKAGE_GH_URL}.\n"
+                    f"follow instructions at {config.PACKAGE_GH_URL}.\n"
                     "Then, execute the command `chatgpt setup`."
                 )
                 return

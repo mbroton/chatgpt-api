@@ -29,7 +29,7 @@ class ChatGPT(httpx.Client):
     def __init__(
         self,
         *,
-        session_token: str,
+        session_token: Union[str, None] = None,
         response_timeout: int = 10,
         **kwargs: Any,
     ) -> None:
@@ -44,18 +44,15 @@ class ChatGPT(httpx.Client):
 
         self.__headers = {
             "Accept": "text/event-stream",
-            # "Authorization": "Bearer ",
             "Content-Type": "application/json",
-            # "User-Agent": self.__user_agent,
             "X-Openai-Assistant-App-Id": "",
             "Connection": "close",
             "Accept-Language": "en-US,en;q=0.9",
             "Referer": "https://chat.openai.com/chat",
+            # These headers will be set dynamically:
+            # "Authorization": "Bearer <token>",
+            # "User-Agent": "<user-agent>",
         }
-
-    @property
-    def conversation_id(self) -> Union[str, None]:
-        return self._conversation_id
 
     def __enter__(self):
         super().__enter__()
@@ -68,7 +65,10 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         try:
-            auth_data = browser.login()
+            auth_data = browser.login(
+                headless=bool(self._session_token) is True,
+                session_token=self._session_token,
+            )
         except Exception as e:
             raise APIClientException(
                 "Authentication via browser failed."
@@ -116,26 +116,12 @@ class ChatGPT(httpx.Client):
                 "model": "text-davinci-002-render",
             }
         )
-
-        print("HEADERS")
-        for k, v in self.__headers.items():
-            print(k, v)
-
-        print()
-        print("COOKIES")
-        for c in self.cookies:
-            print(c)
-
         response = self.post(
             config.CONV_URL,
             content=data,
             headers=self.__headers,
         )
-        print()
-        print("RESPONSE REQUEST HEADERS")
-        print(response.request.headers)
-
-        if response.status_code == 401:
+        if response.status_code in (401, 403):
             raise UnauthorizedException()
         elif response.status_code != 200:
             raise StatusCodeException(response)

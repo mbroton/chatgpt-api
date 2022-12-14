@@ -27,10 +27,12 @@ def _get_cookie(cookies: list, name: str) -> Union[str, None]:
     return c[0] if c else None
 
 
-def login() -> config.AuthData:
+def login(
+    headless: bool = False, session_token: Union[str, None] = None
+) -> config.AuthData:
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(
-            config.ROOT, headless=False
+            config.ROOT, headless=headless
         )
         page = browser.new_page()
         sync_stealth(page, pure=False)
@@ -38,7 +40,8 @@ def login() -> config.AuthData:
         res = sync_cf_retry(page)
         if not res:
             raise Exception("challenge fail")
-        page.wait_for_url("https://chat.openai.com/chat", timeout=360_000)
+        if not headless:
+            page.wait_for_url("https://chat.openai.com/chat", timeout=360_000)
         cookies = page.context.cookies()
         session_token = _get_cookie(
             cookies, "__Secure-next-auth.session-token"
