@@ -32,7 +32,7 @@ def login(
 ) -> config.AuthData:
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(
-            config.BROWSER_DATA, headless=headless
+            config.BROWSER_DATA, headless=False
         )
         page = browser.new_page()
         sync_stealth(page, pure=False)
