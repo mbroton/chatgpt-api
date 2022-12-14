@@ -46,7 +46,6 @@ class ChatGPT(httpx.Client):
         kwargs["timeout"] = response_timeout
         super().__init__(**kwargs)
 
-        self.__cookies: Union[dict, None] = None
         self.__headers: Union[dict, None] = None
 
     @property
@@ -81,9 +80,9 @@ class ChatGPT(httpx.Client):
         )
         if "<title>Please Wait... | Cloudflare</title>" in res.text:
             raise UnauthorizedException("cloudflare")
-
-        self.__cookies = cookies
+        access_token = res.json()["accessToken"]
         self.__headers = headers
+        self.__headers["Authorization"] = "Bearer {}".format(access_token)
         self._auth_flag = True
 
     def send_message(self, message: str) -> Response:
