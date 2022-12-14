@@ -20,13 +20,9 @@ This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](h
 
 ## Status
 
-ChatGPT API often changes. We're trying to make updates as soon as possible. So, if something is not working properly and you recently didn't upgrade `chatgpt-api`, try to do this first:
+Currently chatgpt-api is not working, since OpenAI started to use Cloudflare.
+Workaround in progress.
 
-```sh
-pip install --upgrade chatgpt-api
-```
-
-If that doesn't help, please open an [issue](https://github.com/mbroton/chatgpt-api/issues).
 
 ## Installation
 ### From Pypi
