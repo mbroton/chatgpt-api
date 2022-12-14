@@ -73,6 +73,9 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         auth_data = browser.login()
+        print(auth_data)
+        print(auth_data)
+        print(auth_data)
         self.__user_agent = auth_data.user_agent
         cookies = {
             "cf_clearance": auth_data.cf_clearance,
