@@ -5,7 +5,7 @@
 <p align="center">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/chatgpt-api">
     <img alt="License" src="https://img.shields.io/github/license/mbroton/chatgpt-api">
-    <img alt="Coverage" src="https://img.shields.io/badge/coverage-100%25-green">
+    <img alt="Coverage" src="https://img.shields.io/badge/coverage-96%25-green">
 </p>
 <br>
 
@@ -13,7 +13,7 @@
 
 <br>
 
-This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has 100% code coverage unlike other ChatGPT packages.
+This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has almost 100% code coverage unlike other ChatGPT packages.
 
 ![Long Demo GIF](https://user-images.githubusercontent.com/50829834/206066495-2ed2ae06-899a-41df-8d9e-b1dfc048cfaa.gif)
 
