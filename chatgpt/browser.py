@@ -29,7 +29,9 @@ def _get_cookie(cookies: list, name: str) -> Union[str, None]:
 
 def login() -> config.AuthData:
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch_persistent_context(
+            config.ROOT, headless=False
+        )
         page = browser.new_page()
         sync_stealth(page, pure=False)
         page.goto("https://chat.openai.com/")

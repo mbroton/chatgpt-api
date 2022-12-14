@@ -72,27 +72,22 @@ class ChatGPT(httpx.Client):
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
         auth_data = browser.login()
+        self.cookies.set("cf_clearance", auth_data.cf_clearance)
+        self.cookies.set(self._AUTH_COOKIE_NAME, auth_data.session_token)
         self.__headers["User-Agent"] = auth_data.user_agent
-        cookies = {
-            "cf_clearance": auth_data.cf_clearance,
-            self._AUTH_COOKIE_NAME: auth_data.session_token,
-        }
-        for k, v in cookies.items():
-            self.cookies.set(k, v)
+
         headers = {
             "User-Agent": auth_data.user_agent,
         }
         res = self.get(
             self._AUTH_URL,
             headers=headers,
-            cookies=cookies,
         )
         if "<title>Please Wait... | Cloudflare</title>" in res.text:
             raise UnauthorizedException("cloudflare")
 
         access_token = res.json()["accessToken"]
         self.__headers["Authorization"] = "Bearer {}".format(access_token)
-
         self._auth_flag = True
 
     def send_message(self, message: str) -> Response:

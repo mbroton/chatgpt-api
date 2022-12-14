@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-config_root = Path.home() / ".chatgpt"
-auth_file = config_root / ".auth_data.json"
+ROOT = Path.home() / ".chatgpt"
+AUTH_FILE = ROOT / ".auth_data.json"
 
 
 @dataclass
@@ -25,9 +25,9 @@ class AuthData:
 
 def save_auth(auth_data: AuthData) -> None:
     data = json.dumps(asdict(auth_data))
-    with open(auth_file, "w") as f:
+    with open(AUTH_FILE, "w") as f:
         f.write(data)
 
 
 def read_auth() -> AuthData:
-    return AuthData.from_dict(json.loads(auth_file.read_text()))
+    return AuthData.from_dict(json.loads(AUTH_FILE.read_text()))
