@@ -12,6 +12,7 @@ import httpx
 from chatgpt import browser
 from chatgpt import payloads
 from chatgpt.const import LOGGING_DIR
+from chatgpt.exceptions import APIClientException
 from chatgpt.exceptions import InvalidResponseException
 from chatgpt.exceptions import StatusCodeException
 from chatgpt.exceptions import UnauthorizedException
@@ -71,7 +72,12 @@ class ChatGPT(httpx.Client):
 
     def authenticate(self) -> None:
         """Authenticates HTTP session."""
-        auth_data = browser.login()
+        try:
+            auth_data = browser.login()
+        except Exception as e:
+            raise APIClientException(
+                "Authentication via browser failed."
+            ) from e
         self.cookies.set("cf_clearance", auth_data.cf_clearance)
         self.cookies.set(self._AUTH_COOKIE_NAME, auth_data.session_token)
         self.__headers["User-Agent"] = auth_data.user_agent
