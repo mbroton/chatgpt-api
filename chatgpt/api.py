@@ -106,11 +106,24 @@ class ChatGPT(httpx.Client):
             conv_id=self._conversation_id,
             parent_msg_id=self._parent_message_id,
         )
+
+        print("HEADERS")
+        for k, v in self.__headers.items():
+            print(k, v)
+
+        print()
+        print("COOKIES")
+        for c in self.cookies:
+            print(c)
+
         response = self.post(
             self._CONV_URL,
             content=data,
             headers=self.__headers,
         )
+        print()
+        print("RESPONSE REQUEST HEADERS")
+        print(response.request.headers)
 
         if response.status_code == 401:
             raise UnauthorizedException()
