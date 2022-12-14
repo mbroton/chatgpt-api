@@ -5,3 +5,5 @@ pytest_httpx==0.21.2
 pytest-mock==3.10.0
 coverage==6.5.0
 pre-commit==2.20.0
+playwright==1.28.0
+cf-clearance==0.28.2
