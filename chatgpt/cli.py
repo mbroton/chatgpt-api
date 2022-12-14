@@ -81,7 +81,6 @@ def start(response_timeout: int = 20, user_agent: Union[str, None] = None):
     with ChatGPT(
         session_token=session_key,
         response_timeout=response_timeout,
-        user_agent=user_agent,
     ) as chat:
         _auth_progress.stop()
         console.print(
