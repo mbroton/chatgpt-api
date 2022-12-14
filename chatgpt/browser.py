@@ -3,19 +3,13 @@ Case 1: Login with browser using email and password
 Case 2: Login on server without browser window
 """
 import subprocess
-from dataclasses import dataclass
 from typing import Union
 
 from cf_clearance import sync_cf_retry
 from cf_clearance import sync_stealth
 from playwright.sync_api import sync_playwright
 
-
-@dataclass
-class AuthData:
-    user_agent: str
-    cf_clearance: str
-    session_token: str
+from chatgpt import config
 
 
 def install() -> None:
@@ -33,7 +27,7 @@ def _get_cookie(cookies: list, name: str) -> Union[str, None]:
     return c[0] if c else None
 
 
-def login() -> AuthData:
+def login() -> config.AuthData:
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         page = browser.new_page()
@@ -52,6 +46,6 @@ def login() -> AuthData:
             raise Exception("expected cookies not found")
         ua = page.evaluate("() => {return navigator.userAgent}")
         browser.close()
-    return AuthData(
+    return config.AuthData(
         user_agent=ua, cf_clearance=cf_clearance, session_token=session_token
     )
