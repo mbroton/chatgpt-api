@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import httpx
@@ -15,6 +16,24 @@ from chatgpt.api import ChatGPT
 app = typer.Typer()
 console = Console()
 err_console = Console(stderr=True)
+
+
+@app.command()
+def auth():
+    """Authenticate"""
+    if config.AUTH_FILE.exists():
+        modified_time = config.AUTH_FILE.stat().st_mtime
+        last_auth = datetime.fromtimestamp(modified_time).isoformat()
+    else:
+        last_auth = "never"
+
+    chat = ChatGPT()
+    chat.authenticate(config.read_auth())
+    resp = chat.send_message("Hello! How are you?")
+    console.print(
+        f"Last authentication: {last_auth}.\n" f"Valid: {resp.content}"
+    )
+    chat.close()
 
 
 @app.command()
@@ -65,60 +84,88 @@ def setup():
 @app.command()
 def start(headless: bool = False, response_timeout: int = 20):
     """Start chatting at ChatGPT."""
-    if headless:
-        try:
-            session_key = config.KEY_FILE.read_text()
-        except FileNotFoundError:
-            err_console.print(
-                "[red bold]Config file doesn't exist. "
-                "Use `chatgpt setup` command."
-            )
+    # if headless:
+    #     try:
+    #         session_key = config.KEY_FILE.read_text()
+    #     except FileNotFoundError:
+    #         err_console.print(
+    #             "[red bold]Config file doesn't exist. "
+    #             "Use `chatgpt setup` command."
+    #         )
+    #         return
+
+    if config.AUTH_FILE.exists():
+        modified_time = config.AUTH_FILE.stat().st_mtime
+        last_auth = datetime.fromtimestamp(modified_time).isoformat()
+    else:
+        last_auth = "never"
+
+    chat = ChatGPT(response_timeout=response_timeout)
+    try:
+        chat.authenticate(config.read_auth())
+        chat.send_message("Hello! How are you?")
+        is_valid = True
+    except (exceptions.ForbiddenException, exceptions.UnauthorizedException):
+        is_valid = False
+    except Exception as e:
+        console.print(f"[bold red]Error: {e!r}")
+        return
+
+    valid_msg = "[red]no" if not is_valid else "[green]yes"
+    console.print(f"Last authentication: {last_auth}.\n" f"Valid: {valid_msg}")
+    chat.close()
+
+    if not is_valid:
+        is_auth_allowed = typer.confirm("Log in?")
+        if is_auth_allowed:
+            _auth_progress = console.status("[bold green]Authenticating...")
+            _auth_progress.start()
+            auth_data = browser.login()
+            _auth_progress.stop()
+            chat = ChatGPT(response_timeout=response_timeout)
+            chat.authenticate(auth_data)
+        else:
+            console.print("[bold red]Unauthorized")
             return
 
-    _auth_progress = console.status("[bold green]Authenticating...")
-    _auth_progress.start()
-    with ChatGPT(
-        session_token=session_key if headless else None,
-        response_timeout=response_timeout,
-    ) as chat:
-        _auth_progress.stop()
-        console.print(
-            Panel(
-                "You are starting a conversation.\n"
-                "ChatGPT is going to remember what you said earlier "
-                "in the conversation.\n"
-                "Commands available during conversation:\n"
-                "\t[bold]!new[/] - starting a new conversation\n"
-                "\t[bold]!exit[/] - exit the program (CTRL+C works too)",
-                expand=False,
-            )
+    # ---
+    console.print(
+        Panel(
+            "You are starting a conversation.\n"
+            "ChatGPT is going to remember what you said earlier "
+            "in the conversation.\n"
+            "Commands available during conversation:\n"
+            "\t[bold]!new[/] - starting a new conversation\n"
+            "\t[bold]!exit[/] - exit the program (CTRL+C works too)",
+            expand=False,
         )
-        while True:
-            console.print("[bold]Message:\n> ", end="")
-            message = typer.prompt("", prompt_suffix="")
-            if message == "!new":
-                chat.new_conversation()
-                console.rule("[bold green]Starting new conversation")
-                continue
-            elif message == "!exit":
-                console.print("[bold green]Bye!")
-                break
-            try:
-                with console.status("[bold green]Waiting for response..."):
-                    response = chat.send_message(message)
-            except exceptions.UnauthorizedException:
-                err_console.print(
-                    "[bold red]Unauthorized. Probably your session "
-                    "key expired.\nTo generate a new key, "
-                    f"follow instructions at {config.PACKAGE_GH_URL}.\n"
-                    "Then, execute the command `chatgpt setup`."
-                )
-                return
-            except httpx.ReadTimeout:
-                err_console.print(
-                    "[bold red]Response timed out. ChatGPT may be overloaded, "
-                    "try to increase timeout using `--response-timeout` "
-                    "argument.\nIf it won't help, try again later."
-                )
-                continue
-            console.print(Panel(Markdown(response.content)))
+    )
+    while True:
+        console.print("[bold]Message:\n> ", end="")
+        message = typer.prompt("", prompt_suffix="")
+        if message == "!new":
+            chat.new_conversation()
+            console.rule("[bold green]Starting new conversation")
+            continue
+        elif message == "!exit":
+            console.print("[bold green]Bye!")
+            break
+        try:
+            with console.status("[bold green]Waiting for response..."):
+                response = chat.send_message(message)
+        except exceptions.UnauthorizedException:
+            err_console.print(
+                "[bold red]Unauthorized. Probably your session "
+                "key expired.\nTo generate a new key, "
+                f"follow instructions at {config.PACKAGE_GH_URL}.\n"
+                "Then, execute the command `chatgpt setup`."
+            )
+            return
+        except httpx.ReadTimeout:
+            err_console.print(
+                "[bold red]Response timed out. ChatGPT may be overloaded, "
+                "try to increase timeout using `--response-timeout` "
+                "argument.\nIf it won't help, try again later."
+            )
+            continue
+        console.print(Panel(Markdown(response.content)))

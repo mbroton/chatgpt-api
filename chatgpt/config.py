@@ -2,6 +2,7 @@ import json
 from dataclasses import asdict
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Union
 
 
 # Paths to directories
@@ -27,6 +28,7 @@ class AuthData:
     user_agent: str
     cf_clearance: str
     session_token: str
+    access_token: Union[str, None] = None
 
     @classmethod
     def from_dict(cls, d: dict) -> "AuthData":
@@ -34,6 +36,7 @@ class AuthData:
             user_agent=d["user_agent"],
             cf_clearance=d["cf_clearance"],
             session_token=d["session_token"],
+            access_token=d.get("access_token"),
         )
 
 

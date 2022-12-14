@@ -66,17 +66,25 @@ class ChatGPT(httpx.Client):
         self, auth_data: Union[config.AuthData, None] = None
     ) -> None:
         """Authenticates HTTP session."""
-        if not auth_data:
-            try:
-                auth_data = browser.login(
-                    headless=bool(self._session_token) is True,
-                    session_token=self._session_token,
-                )
-            except Exception as e:
-                raise APIClientException(
-                    "Authentication via browser failed."
-                ) from e
-            config.save_auth(auth_data)
+        if auth_data:
+            self.cookies.set("cf_clearance", auth_data.cf_clearance)
+            self.cookies.set(config.AUTH_COOKIE_NAME, auth_data.session_token)
+            self.__headers["User-Agent"] = auth_data.user_agent
+            self.__headers["Authorization"] = "Bearer {}".format(
+                auth_data.access_token
+            )
+            self._auth_flag = True
+            return
+
+        try:
+            auth_data = browser.login(
+                headless=bool(self._session_token) is True,
+                session_token=self._session_token,
+            )
+        except Exception as e:
+            raise APIClientException(
+                "Authentication via browser failed."
+            ) from e
         self.cookies.set("cf_clearance", auth_data.cf_clearance)
         self.cookies.set(config.AUTH_COOKIE_NAME, auth_data.session_token)
         self.__headers["User-Agent"] = auth_data.user_agent
@@ -91,6 +99,8 @@ class ChatGPT(httpx.Client):
             raise UnauthorizedException("cloudflare")
 
         access_token = res.json()["accessToken"]
+        auth_data.access_token = access_token
+        config.save_auth(auth_data)
         self.__headers["Authorization"] = "Bearer {}".format(access_token)
         self._auth_flag = True
 
