@@ -1,3 +1,8 @@
+## Status
+
+Currently `chatgpt-api` is not working, since OpenAI started to use Cloudflare. Also, it changes almost every day.
+See https://github.com/mbroton/chatgpt-api/issues/18
+
 <h1 align="center">💻 ChatGPT API</h1>
 
 <p align="center">Unofficial API client and CLI for ChatGPT.</p>
@@ -16,12 +21,6 @@
 This project is based on `httpx` (uses only HTTP) and uses [Typer (with Rich)](https://typer.tiangolo.com/) for CLI, so responses are looking good (markdown is supported). Also, It has almost 100% code coverage unlike other ChatGPT packages.
 
 ![Long Demo GIF](https://user-images.githubusercontent.com/50829834/206066495-2ed2ae06-899a-41df-8d9e-b1dfc048cfaa.gif)
-
-
-## Status
-
-Currently chatgpt-api is not working, since OpenAI started to use Cloudflare.
-Workaround in progress.
 
 
 ## Installation
